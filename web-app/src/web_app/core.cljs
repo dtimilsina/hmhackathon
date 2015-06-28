@@ -68,40 +68,63 @@
 (defn assignment-view [app owner]
   (reify
     om/IRenderState
-    (render-state [_ {:keys [as]}]
-      (dom/div #js {:className "assignment-screen screen"}
-               (mini-logo)
-               (dom/div #js {:className "headline"}
-                        (:category as))
+    (render-state [_ {:keys [as mode]}]
+      (case mode
+        (:capture, :check)
+        (dom/div #js {:className "assignment-screen screen"}
+                 (apply dom/div #js {:className "things"}
+                        (map (fn [thing]
+                               (dom/button
+                                #js {:className "big-button huge-button thing-button"
+                                     :onClick (fn [e]
+                                                (om/transact! app
+                                                              (make-goto
+                                                               [:camera [as thing]])))}
+                                thing))
+                             (:things as))))
 
-               (dom/button #js {:className "big-button huge-button camera-button"}
-                           (dom/div nil (str "Capture " (:category as) " items"))
-                           (dom/img #js {:src "image/camera_icon.png"}))
-               (dom/button #js {:className "big-button huge-button check-button"}
-                           (dom/div nil (str "Check Translations"))
-                           (dom/img #js {:src "image/white_x_circle.png"})
-                           (dom/img #js {:src "image/check_rect_white.png"}))))))
+        (dom/div #js {:className "assignment-screen screen"}
+                 (mini-logo)
+                 (dom/div #js {:className "headline"}
+                          (:category as))
+
+                 (dom/button #js {:className "big-button huge-button camera-button"
+                                  :onClick (fn [e]
+                                             (om/set-state! owner :mode :capture))}
+                             (dom/div nil (str "Capture " (:category as) " items"))
+                             (dom/img #js {:src "image/camera_icon.png"}))
+                 (dom/button #js {:className "big-button huge-button check-button"}
+                             (dom/div nil (str "Check Translations"))
+                             (dom/img #js {:src "image/white_x_circle.png"})
+                             (dom/img #js {:src "image/check_rect_white.png"})))))))
 
 (defn camera-view [app owner]
   (reify
     om/IRenderState
-    (render-state [_ {:keys [assignment thing]}]
+    (render-state [_ {:keys [as thing]}]
       (dom/div
        #js {:className "camera-screen screen"}
        (mini-logo)
        (dom/div #js {:className "headline"} thing)
        (dom/div #js {:className "camera-area"} nil)
        (dom/div #js {:className "mini-menu"}
-                (dom/div #js {:className "demi-button capture-button"}
-                         (dom/input #js {:type "file"
-                                         :accept "video/*;capture=camera"
-                                         :className "demi-button"})
-                         (dom/img #js {:src "image/camera_icon.png"})
-                         (dom/div #js {:className "detail"} "Take photo"))
-                (dom/div #js {:className "demi-button upload-button"}
-                         (dom/input #js {:type "file"})
-                         (dom/img #js {:src "image/image_upload.png"})
-                         (dom/div #js {:className "detail"} "Upload photo")))
+                (dom/button #js {:className "demi-button capture-button"
+                                 :onClick (fn [e]
+                                            (.click ($/id "capture-field")))}
+                            (dom/input #js {:type "file"
+                                            :accept "video/*;capture=camera"
+                                            :className "hidden"
+                                            :id "capture-field"})
+                            (dom/img #js {:src "image/camera_icon.png"})
+                            (dom/div #js {:className "detail"} "Take photo"))
+                (dom/button #js {:className "demi-button upload-button"
+                                 :onClick (fn [e]
+                                            (.click ($/id "upload-field")))}
+                            (dom/input #js {:type "file"
+                                            :id "upload-field"
+                                            :className "hidden"})
+                            (dom/img #js {:src "image/image_upload.png"})
+                            (dom/div #js {:className "detail"} "Upload photo")))
        (dom/div #js {:className "query-text"} "What's the Spanish word?")
        (dom/input #js {:type "text"
                        :name "spanish"})))))
@@ -320,6 +343,8 @@
                    :student-home (om/build student-options-view app)
                    :create (om/build creation-view app)
                    :assignment (om/build assignment-view app {:state {:as p}})
+                   :camera (om/build camera-view app {:state {:as (first p)
+                                                              :thing (second p)}})
                    (om/build login-view app)))))))
 
 (defn main []

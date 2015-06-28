@@ -163,3 +163,46 @@ em {
     text-align: center;
     font-size: xx-large;
 }
+
+
+.mini-menu {
+    width: 100%;
+}
+
+.mini-menu button {
+    background-color: #8DCDC1;
+    border: none;
+    color: white;
+}
+
+.demi-button {
+    width: 50%;
+}
+
+.demi-button img {
+    height: 30px;
+}
+
+.capture-button {
+
+}
+
+.query-text {
+    color: white;
+    background-color: #EB6E44;
+    font-size: medium;
+    padding: 5px;
+    text-align: center;
+    word-spacing: 1.5;
+}
+
+
+div.camera-area {
+    background-color: #FFF5C3;
+    height: 200px;
+}
+
+
+input.hidden {
+    display: none;
+}
