@@ -1,5 +1,5 @@
 (ns ^:figwheel-always web-app.core
-    (:require [cljs.core.async :refer [<! >! chan close! put!]]
+    (:require [cljs.core.async :refer [<! >! chan close! put! timeout]]
 
               [om.core :as om :include-macros true]
               [om.dom :as dom :include-macros true]
@@ -100,13 +100,26 @@
 
 (defn camera-view [app owner]
   (reify
+    om/IWillMount
+    (will-mount [_]
+      (go-loop [last nil]
+        (<! (timeout 500))
+        (let [file (aget (.-files ($/id "capture-field")) 0)]
+          (when (not= last file)
+            (.log js/console file)
+            (let [url (<! ($/load-data-url file))]
+              (om/set-state! owner :src url)))
+          (recur file))))
+
     om/IRenderState
-    (render-state [_ {:keys [as thing]}]
+    (render-state [_ {:keys [as thing src]}]
       (dom/div
        #js {:className "camera-screen screen"}
        (mini-logo)
        (dom/div #js {:className "headline"} thing)
-       (dom/div #js {:className "camera-area"} nil)
+       (dom/div #js {:className "camera-area"}
+                (when src
+                  (dom/img #js {:src src})))
        (dom/div #js {:className "mini-menu"}
                 (dom/button #js {:className "demi-button capture-button"
                                  :onClick (fn [e]
@@ -127,6 +140,7 @@
                             (dom/div #js {:className "detail"} "Upload photo")))
        (dom/div #js {:className "query-text"} "What's the Spanish word?")
        (dom/input #js {:type "text"
+                       :className "big-input"
                        :name "spanish"})))))
 
 (defn creation-view [app owner]

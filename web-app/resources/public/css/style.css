@@ -198,10 +198,16 @@ em {
 
 
 div.camera-area {
+    margin-top: 5px;
     background-color: #FFF5C3;
     height: 200px;
+    text-align: center;
 }
 
+div.camera-area img {
+    max-height: 100%;
+    max-width: 100%;
+}
 
 input.hidden {
     display: none;

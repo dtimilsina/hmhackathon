@@ -1,4 +1,5 @@
-(ns web-app.utils)
+(ns web-app.utils
+  (:require [cljs.core.async :refer [chan put!]]))
 
 (extend-type js/HTMLCollection
   ISeqable
@@ -18,3 +19,12 @@
 
 (defn id [id]
   (.getElementById js/document id))
+
+(defn load-data-url [file]
+  (let [fr (js/FileReader.)
+        c (chan)]
+    (set! (.-onload fr) (fn [e]
+                          (.log js/console e)
+                          (put! c (.. e -target -result))))
+    (.readAsDataURL fr file)
+    c))
