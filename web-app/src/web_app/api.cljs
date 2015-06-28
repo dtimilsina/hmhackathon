@@ -27,8 +27,10 @@
     (or (if (= password "password")
           (case user
             "sauron" {:roles "Instructor"
+                      :id "sauron"
                       :name "Sauron Baraddur"}
             "gollum" {:roles "Student"
+                      :id "gollum"
                       :name "Smeagol Smeagolovitch"}
             nil))
         )))
@@ -39,4 +41,10 @@
     (or (:sections user)
         [{:name "Kindergarten Spanish"
           :id "123"
-          :student-usernames ["gollum"]}])))
+          :student-usernames ["gollum"]}
+         {:name "First Grade Spanish"
+          :id "124"
+          :student-usernames ["smaug" "bilbo" "frodo"]}
+         {:name "Second Grade Spanish"
+          :id "125"
+          :student-usernames ["bob crachit" "tiny tim"]}])))

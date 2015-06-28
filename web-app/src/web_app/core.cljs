@@ -13,7 +13,98 @@
 
 ;; define your app data so that it doesn't get over-written on reload
 
-(defonce app-state (atom {:view-stack nil}))
+(defonce app-state (atom {:view-stack nil
+                          :assignments []
+                          :things []}))
+
+(defn mini-logo []
+  (dom/div #js {:className "mini-logo"}
+           (dom/img #js {:src "image/logo.png"})))
+
+(defn teacher-options-view [app owner]
+  (reify
+    om/IRender
+    (render [_]
+      (apply dom/div #js {:className "teacher-options-screen screen"}
+             (mini-logo)
+             (for [[opt-name opt] [["Create New Assignment" :create]
+                                   ["View Assignments" :view-assignments]]]
+               (dom/button #js {:className "big-button huge-button"
+                                :onClick (fn [e]
+                                           (om/transact! app (make-goto [opt]))
+                                           ($/cancel e))}
+                           opt-name))))))
+
+(defn student-options-view [app owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [assignments ($s/student-assignments app (get-in app [:user :id]))
+            grp (group-by :status assignments)
+            make-as (fn [as]
+                      (dom/button
+                       #js {:className "big-button assignment-button"
+                            :onClick (fn [e]
+                                       (om/transact! app
+                                                     (comp
+                                                      (make-goto [:assignment as])
+                                                      #(assoc % :working-on as)))
+                                       ($/cancel e))}
+                       (:category as)))]
+
+        (dom/div #js {:className "student-options-screen screen"}
+                 (mini-logo)
+                 (apply dom/div #js {:className "assignment-group"}
+                        (map make-as (:pending grp)))
+                 (dom/label nil "Complete:")
+                 (dom/br nil)
+                 (if-let [compl (:completed grp)]
+                   (apply dom/div #js {:className "assignment-group"}
+                          (map make-as compl))
+                   (dom/em nil "No completed assignments")))))))
+
+(defn assignment-things-view [])
+
+(defn assignment-view [app owner]
+  (reify
+    om/IRenderState
+    (render-state [_ {:keys [as]}]
+      (dom/div #js {:className "assignment-screen screen"}
+               (mini-logo)
+               (dom/div #js {:className "headline"}
+                        (:category as))
+
+               (dom/button #js {:className "big-button huge-button camera-button"}
+                           (dom/div nil (str "Capture " (:category as) " items"))
+                           (dom/img #js {:src "image/camera_icon.png"}))
+               (dom/button #js {:className "big-button huge-button check-button"}
+                           (dom/div nil (str "Check Translations"))
+                           (dom/img #js {:src "image/white_x_circle.png"})
+                           (dom/img #js {:src "image/check_rect_white.png"}))))))
+
+(defn camera-view [app owner]
+  (reify
+    om/IRenderState
+    (render-state [_ {:keys [assignment thing]}]
+      (dom/div
+       #js {:className "camera-screen screen"}
+       (mini-logo)
+       (dom/div #js {:className "headline"} thing)
+       (dom/div #js {:className "camera-area"} nil)
+       (dom/div #js {:className "mini-menu"}
+                (dom/div #js {:className "demi-button capture-button"}
+                         (dom/input #js {:type "file"
+                                         :accept "video/*;capture=camera"
+                                         :className "demi-button"})
+                         (dom/img #js {:src "image/camera_icon.png"})
+                         (dom/div #js {:className "detail"} "Take photo"))
+                (dom/div #js {:className "demi-button upload-button"}
+                         (dom/input #js {:type "file"})
+                         (dom/img #js {:src "image/image_upload.png"})
+                         (dom/div #js {:className "detail"} "Upload photo")))
+       (dom/div #js {:className "query-text"} "What's the Spanish word?")
+       (dom/input #js {:type "text"
+                       :name "spanish"})))))
 
 (defn creation-view [app owner]
   (reify
@@ -21,21 +112,31 @@
     (init-state [_]
       {})
 
+    om/IDidUpdate
+    (did-update [_ _ prev-state]
+      (when (om/get-state owner :editing)
+        (when-let [field ($/id "new-thing-field")]
+          (.focus field)))
+      (when (and (om/get-state owner :flash)
+                 (:flash prev-state))
+        (om/set-state! owner :flash nil)))
+
     om/IWillMount
     (will-mount [_]
       (when-let [user (:user @app)]
         (go
           (let [sections (<! (api/get-sections user))]
-            (prn "sections:" sections)
             (om/transact! app (fn [app]
                                 (assoc-in app [:user :sections]
                                           sections)))))))
 
     om/IRenderState
-    (render-state [_ {:keys [creating] :as state}]
+    (render-state [_ {:keys [creating flash] :as state}]
       (apply dom/div #js {:className "creation-screen screen"}
-             (dom/div #js {:className "mini-logo"}
-                      (dom/img #js {:src "image/logo.png"}))
+             (mini-logo)
+             (when flash
+               (dom/div #js {:className "flash-message"}
+                        flash))
              (cond
               (not (:section creating))
               (if-let [sections (get-in app [:user :sections])]
@@ -44,9 +145,10 @@
                         #js {:type "button"
                              :className "section-button big-button"
                              :onClick (fn [e]
-                                        (om/set-state! owner
-                                                       [:creating :section]
-                                                       (:id section)))}
+                                        (om/set-state! owner :creating
+                                                       {:section (:id section)
+                                                        :users (:student-usernames section)})
+                                        ($/cancel e))}
                         (:name section)
                         (dom/br nil)
                         (dom/div #js {:className "detail"}
@@ -59,16 +161,17 @@
 
               :default
               [(dom/div #js {:className "options"}
-                        (prn creating)
-                        (dom/label #js {:for "due-date-field"}
-                                   "Due:")
-                        (dom/br nil)
-                        (dom/input #js {:className ""
+                        (dom/label #js {:for "due-date-field"
+                                        :className "mid"}
+                                   "Due")
+                        (dom/input #js {:className "big-input"
                                         :id "due-date-field"
                                         :name "due-date"
                                         :type "date"})
-                        (dom/br nil)
-                        (dom/input #js {:className "text"
+                        (dom/label #js {:for "category-field"
+                                        :className "mid"}
+                                   "Category")
+                        (dom/input #js {:className "text big-input"
                                         :id "category-field"
                                         :name "category"})
                         (dom/hr nil)
@@ -77,8 +180,8 @@
                          (apply dom/div
                                 #js {:className "existing"}
                                 (map (fn [thing]
-                                       (dom/button #js {:className "big-button added-thing"}
-                                                thing))
+                                       (dom/button #js {:className "big-button thing-button"}
+                                                   thing))
                                      (:things creating)))
 
                          (if-let [t (:editing state)]
@@ -107,7 +210,26 @@
                                                        (om/set-state! owner
                                                                       :editing
                                                                       true))}
-                                       (dom/img #js {:src "image/add_circle.png"})))))])))))
+                                       (dom/img #js {:src "image/add_circle.png"}))))
+                        (dom/button #js {:className "big-button save-button"
+                                         :onClick (fn [e]
+                                                    (let [cat (.-value ($/id "category-field"))
+                                                          date (.-value ($/id "due-date-field"))
+                                                          things (:things creating)]
+                                                      (om/transact!
+                                                       app
+                                                       (partial $s/save-new-assignment
+                                                                {:category cat
+                                                                 :date date
+                                                                 :things things
+                                                                 :users (:users creating)}))
+                                                      (om/set-state! owner
+                                                                     :creating
+                                                                     nil)
+                                                      (om/set-state! owner
+                                                                     :flash
+                                                                     "Assignment created!")))}
+                                    "Save"))])))))
 
 (defn login-view [app owner]
   (reify
@@ -138,6 +260,11 @@
                     (recur))))))
           (close! login-chan))))
 
+    om/IDidMount
+    (did-mount [_]
+      (when-let [elt ($/id "login-field")]
+        (.focus elt)))
+
     om/IRenderState
     (render-state [_ {:keys [errors login-chan login-pending]}]
       (dom/div #js {:className "login-screen"}
@@ -152,6 +279,7 @@
                   (dom/div #js {:className "errors"}
                            errors))
                 (dom/input #js {:name "username"
+                                :id "login-field"
                                 :type "text"
                                 :placeholder "Username"})
                 (dom/input #js {:name "password"
@@ -188,7 +316,10 @@
                           ["Not logged in"]))
                (let [[v p] (peek (:view-stack app))]
                  (case v
+                   :teacher-home (om/build teacher-options-view app)
+                   :student-home (om/build student-options-view app)
                    :create (om/build creation-view app)
+                   :assignment (om/build assignment-view app {:state {:as p}})
                    (om/build login-view app)))))))
 
 (defn main []

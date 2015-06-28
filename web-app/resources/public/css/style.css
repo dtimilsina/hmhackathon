@@ -11,7 +11,7 @@ body {
     right: 0;
     font-size: medium;
     text-align: right;
-    padding: 2px;
+    padding: 4px;
     background-color: #7C786A;
     color: white;
 }
@@ -52,6 +52,10 @@ input {
     right: 10px;
 }
 
+.big-input {
+    width: 100%;
+}
+
 .big-button {
     width: 100%;
     color: white;
@@ -59,6 +63,7 @@ input {
     margin-top: 10px;
     padding:5px;
     cursor: pointer;
+    font-size: x-large;
 }
 
 .big-button.login {
@@ -66,6 +71,16 @@ input {
 }
 
 .big-button.sign-up {
+    background-color: #EB6E44;
+}
+
+.huge-button {
+    background-color: #EB6E44;
+    height: 75px;
+    font-size: x-large;
+}
+
+.assignment-button {
     background-color: #EB6E44;
 }
 
@@ -80,6 +95,8 @@ input {
 }
 
 .mini-logo {
+    position: relative;
+    top: -10px;
     text-align: center;
 }
 
@@ -97,4 +114,52 @@ input {
 
 .add-button img {
     height: 30px;
+}
+
+label {
+    color: #888;
+}
+
+label.mid {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+}
+
+em {
+    font-size: medium;
+    color: lightgray;
+}
+
+.assignment-button {
+
+}
+
+.thing-button {
+    background-color: #8DCDC1;
+}
+
+.camera-button {
+    padding: 10px;
+    height: 150px;
+    background-color: #8DCDC1;
+}
+
+.camera-button img {
+    width: 75px;
+    margin: 10px;
+}
+
+.check-button {
+    height: 150px;
+    background-color:  #EB6E44;
+}
+.check-button img {
+    width: 75px;
+    margin: 10px;
+}
+
+.headline {
+    text-align: center;
+    font-size: xx-large;
 }
