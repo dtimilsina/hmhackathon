@@ -10,31 +10,31 @@
 	<string>HMHApi</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>6433F48DBE4FA77B98F9D01DEC868261004B5C17</key>
-		<string>https://github.com/dtimilsina/remoteTranslator.git</string>
+		<key>3111D4FBBED2E6CACCF814539C8FB47E5A48A39A</key>
+		<string>github-brisandbeans:dtimilsina/hmhackathon.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>HMHApi.playground</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>6433F48DBE4FA77B98F9D01DEC868261004B5C17</key>
+		<key>3111D4FBBED2E6CACCF814539C8FB47E5A48A39A</key>
 		<string>..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/dtimilsina/remoteTranslator.git</string>
+	<string>github-brisandbeans:dtimilsina/hmhackathon.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>6433F48DBE4FA77B98F9D01DEC868261004B5C17</string>
+	<string>3111D4FBBED2E6CACCF814539C8FB47E5A48A39A</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>6433F48DBE4FA77B98F9D01DEC868261004B5C17</string>
+			<string>3111D4FBBED2E6CACCF814539C8FB47E5A48A39A</string>
 			<key>IDESourceControlWCCName</key>
-			<string>remoteTranslator</string>
+			<string>hmhackathon</string>
 		</dict>
 	</array>
 </dict>
