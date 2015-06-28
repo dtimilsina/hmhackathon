@@ -106,7 +106,6 @@
         (<! (timeout 500))
         (let [file (aget (.-files ($/id "capture-field")) 0)]
           (when (not= last file)
-            (.log js/console file)
             (let [url (<! ($/load-data-url file))]
               (om/set-state! owner :src url)))
           (recur file))))

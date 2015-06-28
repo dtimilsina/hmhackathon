@@ -24,7 +24,6 @@
   (let [fr (js/FileReader.)
         c (chan)]
     (set! (.-onload fr) (fn [e]
-                          (.log js/console e)
                           (put! c (.. e -target -result))))
     (.readAsDataURL fr file)
     c))
