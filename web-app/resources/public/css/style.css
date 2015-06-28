@@ -1,0 +1,100 @@
+/* some style */
+body {
+    font-size: x-large;
+    font-family: Helvetica;
+}
+
+.header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    font-size: medium;
+    text-align: right;
+    padding: 2px;
+    background-color: #7C786A;
+    color: white;
+}
+
+.app-container {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    box-shadow: -3px 3px 8px gray;
+    padding: 20px;
+}
+
+.screen {
+    padding-top: 20px;
+}
+
+.login-screen {
+    text-align: center;
+}
+
+.errors {
+    border: 2px solid maroon;
+    background-color: lightpink;
+    color: maroon;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+input {
+    font-size: x-large;
+    text-align: center;
+}
+
+.float-bottom {
+    position: absolute;
+    bottom: 30px;
+    left: 10px;
+    right: 10px;
+}
+
+.big-button {
+    width: 100%;
+    color: white;
+    border: none;
+    margin-top: 10px;
+    padding:5px;
+    cursor: pointer;
+}
+
+.big-button.login {
+    background-color: #8DCDC1;
+}
+
+.big-button.sign-up {
+    background-color: #EB6E44;
+}
+
+.section-button {
+    text-align: left;
+    font-size: large;
+    background-color: #EB6E44;
+}
+
+.detail {
+    font-size: small;
+}
+
+.mini-logo {
+    text-align: center;
+}
+
+.mini-logo img {
+    width: 70px;
+}
+
+.add-button {
+    background-color: #EB6E44;
+}
+
+.added-thing {
+    background-color: ##8DCDC1;
+}
+
+.add-button img {
+    height: 30px;
+}
